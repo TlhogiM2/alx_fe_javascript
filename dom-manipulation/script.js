@@ -5,6 +5,34 @@ let quotes = [
     { text: "Get busy living or get busy dying.", category: "Motivation" }
 ];
 
+// Function to create the form for adding a new quote
+function createAddQuoteForm() {
+    const formContainer = document.createElement('div');
+
+    const quoteInput = document.createElement('input');
+    quoteInput.id = 'newQuoteText';
+    quoteInput.type = 'text';
+    quoteInput.placeholder = 'Enter a new quote';
+    
+    const categoryInput = document.createElement('input');
+    categoryInput.id = 'newQuoteCategory';
+    categoryInput.type = 'text';
+    categoryInput.placeholder = 'Enter quote category';
+
+    const addButton = document.createElement('button');
+    addButton.textContent = 'Add Quote';
+    addButton.onclick = addQuote;
+
+    formContainer.appendChild(quoteInput);
+    formContainer.appendChild(categoryInput);
+    formContainer.appendChild(addButton);
+
+    document.body.appendChild(formContainer);
+}
+
+// Call createAddQuoteForm to add the form on page load
+createAddQuoteForm();
+
 // Function to display a random quote
 function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -29,7 +57,7 @@ function addQuote() {
         // Add new quote to the array
         quotes.push({ text: quoteText, category: quoteCategory });
 
-        // Display the new quote immediately (optional)
+        // Optionally, display the new quote
         showRandomQuote();
 
         // Clear input fields
@@ -39,3 +67,4 @@ function addQuote() {
         alert("Please enter both quote text and category.");
     }
 }
+
