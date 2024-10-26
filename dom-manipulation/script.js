@@ -35,6 +35,7 @@ function populateCategories() {
     const lastSelectedCategory = localStorage.getItem('selectedCategory');
     if (lastSelectedCategory) {
         categoryFilter.value = lastSelectedCategory;
+        filterQuotes();
     }
 }
 
@@ -51,6 +52,14 @@ function filterQuotes() {
     quoteDisplay.innerHTML = filteredQuotes.map(quote =>
         `<p><strong>${quote.category}:</strong> ${quote.text}</p>`
     ).join('');
+}
+
+// Show a random quote
+function showRandomQuote() {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    const selectedQuote = quotes[randomIndex];
+    const quoteDisplay = document.getElementById('quoteDisplay');
+    quoteDisplay.innerHTML = `<p><strong>${selectedQuote.category}:</strong> ${selectedQuote.text}</p>`;
 }
 
 // Add a new quote and update categories
@@ -76,5 +85,4 @@ function addQuote() {
 // Call functions on page load
 loadQuotes();
 populateCategories();
-filterQuotes();  // Apply filter based on saved category
-
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
