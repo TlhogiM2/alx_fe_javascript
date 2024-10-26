@@ -21,6 +21,24 @@ function saveQuotes() {
     localStorage.setItem('quotes', JSON.stringify(quotes));
 }
 
+// Display a notification to the user
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '10px';
+    notification.style.right = '10px';
+    notification.style.backgroundColor = '#28a745';
+    notification.style.color = '#fff';
+    notification.style.padding = '10px';
+    notification.style.borderRadius = '5px';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000); // Remove notification after 3 seconds
+}
+
 // Populate the dropdown with unique categories
 function populateCategories() {
     const categoryFilter = document.getElementById('categoryFilter');
@@ -116,7 +134,7 @@ async function syncQuotesToServer() {
                 })
             });
         }
-        console.log('Quotes synced to server');
+        showNotification("Quotes synced with server!");
     } catch (error) {
         console.error('Error syncing quotes to server:', error);
     }
@@ -144,29 +162,7 @@ function resolveConflicts(serverQuotes) {
 
     if (hasConflict) {
         saveQuotes();
-        alert('Conflicts were found and resolved. Server data was prioritized.');
-    }
-}
-
-// Manually resolve conflicts
-function manualConflictResolution() {
-    const conflicts = quotes.filter(quote => quote.conflict);
-
-    if (conflicts.length > 0) {
-        const userChoice = confirm('Conflicts found. Would you like to use server data?');
-        
-        if (userChoice) {
-            conflicts.forEach(quote => {
-                quote.category = quote.serverCategory;
-                delete quote.conflict;
-            });
-            saveQuotes();
-            alert('Conflicts resolved with server data.');
-        } else {
-            alert('Conflicts remain unresolved.');
-        }
-    } else {
-        alert('No conflicts detected.');
+        showNotification('Conflicts were found and resolved with server data!');
     }
 }
 
