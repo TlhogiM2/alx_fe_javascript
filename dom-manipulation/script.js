@@ -22,16 +22,16 @@ document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 // Function to add a new quote
 function addQuote() {
-    const quoteText = document.getElementById('newQuoteText').value;
-    const quoteCategory = document.getElementById('newQuoteCategory').value;
+    const quoteText = document.getElementById('newQuoteText').value.trim();
+    const quoteCategory = document.getElementById('newQuoteCategory').value.trim();
 
     if (quoteText && quoteCategory) {
         // Add new quote to the array
         quotes.push({ text: quoteText, category: quoteCategory });
-        
-        // Optionally, display the new quote
+
+        // Display the new quote immediately (optional)
         showRandomQuote();
-        
+
         // Clear input fields
         document.getElementById('newQuoteText').value = '';
         document.getElementById('newQuoteCategory').value = '';
@@ -39,4 +39,3 @@ function addQuote() {
         alert("Please enter both quote text and category.");
     }
 }
-
