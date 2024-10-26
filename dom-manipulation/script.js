@@ -5,6 +5,9 @@ let quotes = [
     { text: "Get busy living or get busy dying.", category: "Motivation" }
 ];
 
+// Define API endpoint for simulated server interaction
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts';
+
 // Load quotes from local storage if available
 function loadQuotes() {
     const storedQuotes = localStorage.getItem('quotes');
@@ -82,7 +85,96 @@ function addQuote() {
     }
 }
 
-// Call functions on page load
+// Fetch quotes from server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(SERVER_URL);
+        const serverQuotes = await response.json();
+
+        // Map server data to local format and replace local quotes if newer
+        const mappedQuotes = serverQuotes.map(q => ({
+            text: q.title,
+            category: q.body
+        }));
+
+        resolveConflicts(mappedQuotes);
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+    }
+}
+
+// Sync local quotes to server
+async function syncQuotesToServer() {
+    try {
+        for (const quote of quotes) {
+            await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: quote.text,
+                    body: quote.category
+                })
+            });
+        }
+        console.log('Quotes synced to server');
+    } catch (error) {
+        console.error('Error syncing quotes to server:', error);
+    }
+}
+
+// Resolve conflicts based on server data taking precedence
+function resolveConflicts(serverQuotes) {
+    const localQuotes = quotes;
+    let hasConflict = false;
+
+    // Compare local and server quotes to detect conflicts
+    serverQuotes.forEach(serverQuote => {
+        const localQuote = localQuotes.find(q => q.text === serverQuote.text);
+        
+        if (!localQuote) {
+            // New quote from server, add to local
+            quotes.push(serverQuote);
+            hasConflict = true;
+        } else if (localQuote.category !== serverQuote.category) {
+            // Conflict detected, server data takes precedence
+            localQuote.category = serverQuote.category;
+            hasConflict = true;
+        }
+    });
+
+    if (hasConflict) {
+        saveQuotes();
+        alert('Conflicts were found and resolved. Server data was prioritized.');
+    }
+}
+
+// Manually resolve conflicts
+function manualConflictResolution() {
+    const conflicts = quotes.filter(quote => quote.conflict);
+
+    if (conflicts.length > 0) {
+        const userChoice = confirm('Conflicts found. Would you like to use server data?');
+        
+        if (userChoice) {
+            conflicts.forEach(quote => {
+                quote.category = quote.serverCategory;
+                delete quote.conflict;
+            });
+            saveQuotes();
+            alert('Conflicts resolved with server data.');
+        } else {
+            alert('Conflicts remain unresolved.');
+        }
+    } else {
+        alert('No conflicts detected.');
+    }
+}
+
+// Periodically sync data
+setInterval(fetchQuotesFromServer, 60000); // Fetch every 60 seconds
+setInterval(syncQuotesToServer, 120000);   // Sync to server every 120 seconds
+
+// Initial setup on page load
 loadQuotes();
 populateCategories();
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
